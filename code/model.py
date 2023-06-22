@@ -1,7 +1,6 @@
 # import libraries
 import pandas as pd
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.ensemble import AdaBoostClassifier
 from sklearn.neighbors import KNeighborsClassifier
@@ -42,14 +41,6 @@ def stacking_classify(x_train: pd.DataFrame, x_test: pd.DataFrame, y_train: pd.D
     return accuracy_score(y_test, y_pred)
 
 
-# standardize and split data
-def standardize_split(x, y):
-    scaler = StandardScaler()
-    x = scaler.fit_transform(x)
-    x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, stratify=y, random_state=32)
-    return x_train, x_test, y_train, y_test
-
-
 # visualization
 def visualize(df: pd.DataFrame):
     plt.ylim((0.8, 1.1))
@@ -64,7 +55,7 @@ def visualize(df: pd.DataFrame):
 def run(df: pd.DataFrame):
     results = []
     x, y = df.iloc[:, 1:], df.iloc[:, 0]
-    x_train, x_test, y_train, y_test = standardize_split(x, y)
+    x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, stratify=y, random_state=45)
     models = {'Random Forest': random_forest_classify, 'AdaBoost': ada_boost_classify, 'Stacking': stacking_classify}
     for name, model in models.items():
         results.append([name, model(x_train, x_test, y_train, y_test)])
@@ -74,5 +65,5 @@ def run(df: pd.DataFrame):
 
 
 if __name__ == '__main__':
-    cancer_data = pd.read_csv('../data/Cancer_Data.csv', sep=',', index_col=0).iloc[:, :-1]
+    cancer_data = pd.read_csv('../data/Cancer_Data_Cleaned.csv', sep=',')
     run(cancer_data)
